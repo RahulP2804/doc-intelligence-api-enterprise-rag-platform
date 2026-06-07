@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: doc-intelligence-api
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:docintellect}
+    username: ${DB_USER:docintellect}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: public
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 5000
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: doc-intelligence-api
+
+app:
+  vertex:
+    project-id: ${GCP_PROJECT_ID}
+    location: ${GCP_LOCATION:us-central1}
+    credentials-path: ${GOOGLE_APPLICATION_CREDENTIALS}
+    embedding-model: textembedding-gecko@003
+    generation-model: gemini-1.5-flash
+    timeout-seconds: 10
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    embedding-model: text-embedding-3-small
+    generation-model: gpt-4o-mini
+  rag:
+    similarity-threshold: 0.75
+    default-top-k: 5
+    chunk-size-tokens: 512
+    chunk-overlap-tokens: 64
+  rate-limit:
+    tiers:
+      FREE: 20
+      PRO: 200
+      ENTERPRISE: 2000
+    window-seconds: 60
+  queue:
+    processing-key: doc:processing:queue
+    poll-timeout-seconds: 5
